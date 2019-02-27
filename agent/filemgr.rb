@@ -24,6 +24,15 @@ module MCollective
         status
       end
 
+      def startup_hook
+        begin
+          Validator.typecheck(true, :boolean)
+        rescue ValidatorError
+          Log.debug('TypecheckValidator is missing, reloading validators.')
+          PluginManager.find_and_load("validator")
+        end
+      end
+
       def get_filename
         request[:file] || config.pluginconf["filemgr.touch_file"] || "/var/run/mcollective.plugin.filemgr.touch"
       end
